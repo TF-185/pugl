@@ -107,6 +107,7 @@ using EventType    = PuglEventType;    ///< @copydoc PuglEventType
 using EventFlag    = PuglEventFlag;    ///< @copydoc PuglEventFlag
 using EventFlags   = PuglEventFlags;   ///< @copydoc PuglEventFlags
 using CrossingMode = PuglCrossingMode; ///< @copydoc PuglCrossingMode
+using Clipboard    = PuglClipboard;    ///< @copydoc PuglClipboard
 
 /// @copydoc PuglCreateEvent
 using CreateEvent = Event<PUGL_CREATE, PuglCreateEvent>;
@@ -570,15 +571,16 @@ public:
   }
 
   /// @copydoc puglGetNumClipboardTypes
-  uint32_t numClipboardTypes() const
+  uint32_t numClipboardTypes(const Clipboard clipboard) const
   {
-    return puglGetNumClipboardTypes(cobj());
+    return puglGetNumClipboardTypes(cobj(), clipboard);
   }
 
   /// @copydoc puglGetClipboardType
-  const char* clipboardType(const uint32_t typeIndex) const
+  const char* clipboardType(const Clipboard clipboard,
+                            const uint32_t  typeIndex) const
   {
-    return puglGetClipboardType(cobj(), typeIndex);
+    return puglGetClipboardType(cobj(), clipboard, typeIndex);
   }
 
   /**
