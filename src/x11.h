@@ -28,6 +28,19 @@ typedef struct {
   Atom NET_WM_STATE_DEMANDS_ATTENTION;
   Atom NET_WM_STATE_HIDDEN;
   Atom TARGETS;
+  Atom XdndActionCopy;
+  Atom XdndActionLink;
+  Atom XdndActionMove;
+  Atom XdndActionPrivate;
+  Atom XdndAware;
+  Atom XdndDrop;
+  Atom XdndEnter;
+  Atom XdndFinished;
+  Atom XdndLeave;
+  Atom XdndPosition;
+  Atom XdndSelection;
+  Atom XdndStatus;
+  Atom XdndTypeList;
   Atom text_uri_list;
 } PuglX11Atoms;
 
@@ -72,6 +85,7 @@ struct PuglInternalsImpl {
   PuglEvent        pendingConfigure;
   PuglEvent        pendingExpose;
   PuglX11Clipboard clipboard;
+  PuglX11Clipboard drag;
   int              screen;
   const char*      cursorName;
 };

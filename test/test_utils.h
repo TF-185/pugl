@@ -255,6 +255,8 @@ puglViewHintString(const PuglViewHint hint)
     return "Ignore key repeat";
   case PUGL_REFRESH_RATE:
     return "Refresh rate";
+  case PUGL_ACCEPT_DROP:
+    return "Accept drop";
   }
 
   return "Unknown";
