@@ -423,15 +423,15 @@ handleCrossing(PuglWrapperView* view, NSEvent* event, const PuglEventType type)
   const NSPoint           wloc = [view eventLocation:event];
   const NSPoint           rloc = [NSEvent mouseLocation];
   const PuglCrossingEvent ev   = {
-    type,
-    0,
-    [event timestamp],
-    wloc.x,
-    wloc.y,
-    rloc.x,
-    [[NSScreen mainScreen] frame].size.height - rloc.y,
-    getModifiers(event),
-    PUGL_CROSSING_NORMAL,
+      type,
+      0,
+      [event timestamp],
+      wloc.x,
+      wloc.y,
+      rloc.x,
+      [[NSScreen mainScreen] frame].size.height - rloc.y,
+      getModifiers(event),
+      PUGL_CROSSING_NORMAL,
   };
 
   PuglEvent crossingEvent;
@@ -464,14 +464,14 @@ handleCrossing(PuglWrapperView* view, NSEvent* event, const PuglEventType type)
   const NSPoint         wloc = [self eventLocation:event];
   const NSPoint         rloc = [NSEvent mouseLocation];
   const PuglMotionEvent ev   = {
-    PUGL_MOTION,
-    0,
-    [event timestamp],
-    wloc.x,
-    wloc.y,
-    rloc.x,
-    [[NSScreen mainScreen] frame].size.height - rloc.y,
-    getModifiers(event),
+      PUGL_MOTION,
+      0,
+      [event timestamp],
+      wloc.x,
+      wloc.y,
+      rloc.x,
+      [[NSScreen mainScreen] frame].size.height - rloc.y,
+      getModifiers(event),
   };
 
   PuglEvent motionEvent;
@@ -499,15 +499,15 @@ handleCrossing(PuglWrapperView* view, NSEvent* event, const PuglEventType type)
   const NSPoint         wloc = [self eventLocation:event];
   const NSPoint         rloc = [NSEvent mouseLocation];
   const PuglButtonEvent ev   = {
-    PUGL_BUTTON_PRESS,
-    0,
-    [event timestamp],
-    wloc.x,
-    wloc.y,
-    rloc.x,
-    [[NSScreen mainScreen] frame].size.height - rloc.y,
-    getModifiers(event),
-    (uint32_t)[event buttonNumber],
+      PUGL_BUTTON_PRESS,
+      0,
+      [event timestamp],
+      wloc.x,
+      wloc.y,
+      rloc.x,
+      [[NSScreen mainScreen] frame].size.height - rloc.y,
+      getModifiers(event),
+      (uint32_t)[event buttonNumber],
   };
 
   PuglEvent pressEvent;
@@ -520,15 +520,15 @@ handleCrossing(PuglWrapperView* view, NSEvent* event, const PuglEventType type)
   const NSPoint         wloc = [self eventLocation:event];
   const NSPoint         rloc = [NSEvent mouseLocation];
   const PuglButtonEvent ev   = {
-    PUGL_BUTTON_RELEASE,
-    0,
-    [event timestamp],
-    wloc.x,
-    wloc.y,
-    rloc.x,
-    [[NSScreen mainScreen] frame].size.height - rloc.y,
-    getModifiers(event),
-    (uint32_t)[event buttonNumber],
+      PUGL_BUTTON_RELEASE,
+      0,
+      [event timestamp],
+      wloc.x,
+      wloc.y,
+      rloc.x,
+      [[NSScreen mainScreen] frame].size.height - rloc.y,
+      getModifiers(event),
+      (uint32_t)[event buttonNumber],
   };
 
   PuglEvent releaseEvent;
@@ -1632,8 +1632,9 @@ puglGetClipboardType(const PuglView* PUGL_UNUSED(view),
 
 PuglStatus
 puglAcceptOffer(PuglView* const                 view,
-                const PuglDataOfferEvent* const PUGL_UNUSED(offer),
-                const uint32_t                  typeIndex)
+                const PuglDataOfferEvent* const offer,
+                const uint32_t                  typeIndex,
+                const PuglRect                  region)
 {
   PuglWrapperView* const wrapper    = view->impl->wrapperView;
   NSPasteboard* const    pasteboard = [NSPasteboard generalPasteboard];
@@ -1649,8 +1650,12 @@ puglAcceptOffer(PuglView* const                 view,
   wrapper->dragOperation = NSDragOperationCopy;
   wrapper->dragTypeIndex = typeIndex;
 
-  const PuglDataEvent data = {
-    PUGL_DATA, 0U, puglGetTime(view->world), (uint32_t)typeIndex};
+  const PuglDataEvent data = {PUGL_DATA,
+                              0U,
+                              puglGetTime(view->world),
+                              (double)region.x,
+                              (double)region.y,
+                              (uint32_t)typeIndex};
 
   PuglEvent dataEvent;
   dataEvent.data = data;
