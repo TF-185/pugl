@@ -994,41 +994,53 @@ translateClientMessage(PuglView* const view, XClientMessageEvent message)
 }
 
 static PuglViewStyleFlags
+translateViewStyleFlags(const PuglX11Atoms* const atoms,
+                        const unsigned long       numHints,
+                        const Atom* const         hints)
+{
+  PuglViewStyleFlags style = 0U;
+
+  for (unsigned long i = 0U; i < numHints; ++i) {
+    if (hints[i] == atoms->NET_WM_STATE_MAXIMIZED_VERT) {
+      style |= PUGL_VIEW_STYLE_TALL;
+    } else if (hints[i] == atoms->NET_WM_STATE_MAXIMIZED_HORZ) {
+      style |= PUGL_VIEW_STYLE_WIDE;
+    } else if (hints[i] == atoms->NET_WM_STATE_HIDDEN) {
+      style |= PUGL_VIEW_STYLE_HIDDEN;
+    } else if (hints[i] == atoms->NET_WM_STATE_FULLSCREEN) {
+      style |= PUGL_VIEW_STYLE_FULLSCREEN;
+    } else if (hints[i] == atoms->NET_WM_STATE_MODAL) {
+      style |= PUGL_VIEW_STYLE_MODAL;
+    } else if (hints[i] == atoms->NET_WM_STATE_ABOVE) {
+      style |= PUGL_VIEW_STYLE_ABOVE;
+    } else if (hints[i] == atoms->NET_WM_STATE_BELOW) {
+      style |= PUGL_VIEW_STYLE_BELOW;
+    } else if (hints[i] == atoms->NET_WM_STATE_DEMANDS_ATTENTION) {
+      style |= PUGL_VIEW_STYLE_DEMANDING;
+    }
+  }
+
+  return style;
+}
+
+static PuglViewStyleFlags
 getCurrentViewStyleFlags(PuglView* const view)
 {
   const PuglX11Atoms* const atoms = &view->world->impl->atoms;
 
   unsigned long      numHints = 0;
   Atom*              hints    = NULL;
-  PuglViewStyleFlags state    = 0U;
+  PuglViewStyleFlags style    = 0U;
   if (!getAtomProperty(
         view, view->impl->win, atoms->NET_WM_STATE, &numHints, &hints)) {
-    for (unsigned long i = 0; i < numHints; ++i) {
-      if (hints[i] == atoms->NET_WM_STATE_MAXIMIZED_VERT) {
-        state |= PUGL_VIEW_STYLE_TALL;
-      } else if (hints[i] == atoms->NET_WM_STATE_MAXIMIZED_HORZ) {
-        state |= PUGL_VIEW_STYLE_WIDE;
-      } else if (hints[i] == atoms->NET_WM_STATE_HIDDEN) {
-        state |= PUGL_VIEW_STYLE_HIDDEN;
-      } else if (hints[i] == atoms->NET_WM_STATE_FULLSCREEN) {
-        state |= PUGL_VIEW_STYLE_FULLSCREEN;
-      } else if (hints[i] == atoms->NET_WM_STATE_MODAL) {
-        state |= PUGL_VIEW_STYLE_MODAL;
-      } else if (hints[i] == atoms->NET_WM_STATE_ABOVE) {
-        state |= PUGL_VIEW_STYLE_ABOVE;
-      } else if (hints[i] == atoms->NET_WM_STATE_BELOW) {
-        state |= PUGL_VIEW_STYLE_BELOW;
-      } else if (hints[i] == atoms->NET_WM_STATE_DEMANDS_ATTENTION) {
-        state |= PUGL_VIEW_STYLE_DEMANDING;
-      }
-    }
+    style = translateViewStyleFlags(atoms, numHints, hints);
   }
 
   if (view->impl->mapped) {
-    state |= PUGL_VIEW_STYLE_MAPPED;
+    style |= PUGL_VIEW_STYLE_MAPPED;
   }
 
-  return state;
+  return style;
 }
 
 static PuglEvent
