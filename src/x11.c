@@ -2001,6 +2001,10 @@ puglSetSizeHint(PuglView* const    view,
                 const PuglSpan     width,
                 const PuglSpan     height)
 {
+  if ((unsigned)hint >= PUGL_NUM_SIZE_HINTS) {
+    return PUGL_BAD_PARAMETER;
+  }
+
   view->sizeHints[hint].width  = width;
   view->sizeHints[hint].height = height;
   return updateSizeHints(view);
