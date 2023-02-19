@@ -12,6 +12,7 @@
 #include "pugl/attributes.h"
 #include "pugl/pugl.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -59,6 +60,10 @@ puglExpose(PuglView* view, const PuglEvent* event);
 /// Dispatch `event` to `view`, entering graphics context if necessary
 PuglStatus
 puglDispatchEvent(PuglView* view, const PuglEvent* event);
+
+/// Return true if `style` describes a visible view that may need drawing
+bool
+puglViewStyleIsVisible(PuglViewStyleFlags style);
 
 PUGL_END_DECLS
 

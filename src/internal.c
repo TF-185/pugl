@@ -244,3 +244,9 @@ puglDispatchEvent(PuglView* view, const PuglEvent* event)
 
   return st0 ? st0 : st1;
 }
+
+bool
+puglViewStyleIsVisible(const PuglViewStyleFlags style)
+{
+  return (style & PUGL_VIEW_STYLE_MAPPED) && !(style & PUGL_VIEW_STYLE_HIDDEN);
+}
