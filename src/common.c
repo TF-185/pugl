@@ -10,9 +10,7 @@
 
 #include "pugl/pugl.h"
 
-#include <limits.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -128,6 +126,11 @@ puglSetDefaultHints(PuglView* const view)
   view->hints[PUGL_REFRESH_RATE]          = PUGL_DONT_CARE;
   view->hints[PUGL_VIEW_TYPE]             = PUGL_DONT_CARE;
 
+  for (unsigned i = 0U; i < PUGL_NUM_POSITION_HINTS; ++i) {
+    view->positionHints[i].x = PUGL_NO_COORD;
+    view->positionHints[i].y = PUGL_NO_COORD;
+  }
+
   for (unsigned i = 0U; i < PUGL_NUM_SIZE_HINTS; ++i) {
     view->sizeHints[i].width  = PUGL_NO_SPAN;
     view->sizeHints[i].height = PUGL_NO_SPAN;
@@ -143,10 +146,7 @@ puglNewView(PuglWorld* const world)
     return NULL;
   }
 
-  view->world    = world;
-  view->defaultX = INT_MIN;
-  view->defaultY = INT_MIN;
-
+  view->world = world;
   puglSetDefaultHints(view);
 
   // Add to world view list
@@ -295,16 +295,15 @@ puglGetFrame(const PuglView* view)
   }
 
   // Get the default position if set, or fallback to (0, 0)
-  int x = view->defaultX;
-  int y = view->defaultY;
-  if (x < INT16_MIN || x > INT16_MAX || y < INT16_MIN || y > INT16_MAX) {
-    x = 0;
-    y = 0;
+  PuglPoint pos = view->positionHints[PUGL_DEFAULT_POSITION];
+  if (!puglIsValidPosition(pos)) {
+    pos.x = 0;
+    pos.y = 0;
   }
 
   // Return the default frame, sanitized if necessary
-  const PuglRect frame = {(PuglCoord)x,
-                          (PuglCoord)y,
+  const PuglRect frame = {pos.x,
+                          pos.y,
                           view->sizeHints[PUGL_DEFAULT_SIZE].width,
                           view->sizeHints[PUGL_DEFAULT_SIZE].height};
   return frame;

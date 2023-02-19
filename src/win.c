@@ -1221,10 +1221,10 @@ puglSetFrame(PuglView* view, const PuglRect frame)
 {
   if (!view->impl->hwnd) {
     // Set defaults to be used when realized
-    view->defaultX                            = frame.x;
-    view->defaultY                            = frame.y;
-    view->sizeHints[PUGL_DEFAULT_SIZE].width  = (PuglSpan)frame.width;
-    view->sizeHints[PUGL_DEFAULT_SIZE].height = (PuglSpan)frame.height;
+    view->positionHints[PUGL_DEFAULT_POSITION].x = frame.x;
+    view->positionHints[PUGL_DEFAULT_POSITION].y = frame.y;
+    view->sizeHints[PUGL_DEFAULT_SIZE].width     = (PuglSpan)frame.width;
+    view->sizeHints[PUGL_DEFAULT_SIZE].height    = (PuglSpan)frame.height;
     return PUGL_SUCCESS;
   }
 
@@ -1301,6 +1301,23 @@ puglSetSize(PuglView* const view, const unsigned width, const unsigned height)
                         SWP_NOMOVE)
            ? PUGL_SUCCESS
            : PUGL_UNKNOWN_ERROR;
+}
+
+PuglStatus
+puglSetPositionHint(PuglView* const        view,
+                    const PuglPositionHint hint,
+                    const int              x,
+                    const int              y)
+{
+  if (x <= INT16_MIN || x > INT16_MAX || y <= INT16_MIN || y > INT16_MAX) {
+    return PUGL_BAD_PARAMETER;
+  }
+
+  view->positionHints[hint].x = (PuglCoord)x;
+  view->positionHints[hint].y = (PuglCoord)y;
+
+  return (hint == PUGL_CURRENT_POSITION) ? puglSetPosition(view, x, y)
+                                         : PUGL_SUCCESS;
 }
 
 PuglStatus
@@ -1545,14 +1562,12 @@ getInitialFrame(PuglView* const view)
     return frame;
   }
 
-  const PuglSpan defaultWidth  = view->sizeHints[PUGL_DEFAULT_SIZE].width;
-  const PuglSpan defaultHeight = view->sizeHints[PUGL_DEFAULT_SIZE].height;
-  const int      x             = view->defaultX;
-  const int      y             = view->defaultY;
-  if (x >= INT16_MIN && x <= INT16_MAX && y >= INT16_MIN && y <= INT16_MAX) {
+  const PuglSpan  defaultWidth  = view->sizeHints[PUGL_DEFAULT_SIZE].width;
+  const PuglSpan  defaultHeight = view->sizeHints[PUGL_DEFAULT_SIZE].height;
+  const PuglPoint pos           = view->positionHints[PUGL_DEFAULT_POSITION];
+  if (puglIsValidPosition(pos)) {
     // Use the default position set with puglSetPosition while unrealized
-    const PuglRect frame = {
-      (PuglCoord)x, (PuglCoord)y, defaultWidth, defaultHeight};
+    const PuglRect frame = {pos.x, pos.y, defaultWidth, defaultHeight};
     return frame;
   }
 

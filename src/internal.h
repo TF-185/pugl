@@ -18,6 +18,10 @@
 
 PUGL_BEGIN_DECLS
 
+/// Return true if `pos` is a valid view position
+bool
+puglIsValidPosition(PuglPoint pos);
+
 /// Return true if `size` is a valid view size
 bool
 puglIsValidSize(PuglViewSize size);

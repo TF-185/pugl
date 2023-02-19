@@ -13,6 +13,12 @@
 #include <string.h>
 
 bool
+puglIsValidPosition(const PuglPoint pos)
+{
+  return (pos.x != PUGL_NO_COORD && pos.y != PUGL_NO_COORD);
+}
+
+bool
 puglIsValidSize(const PuglViewSize size)
 {
   return (size.width != PUGL_NO_SPAN) && (size.height != PUGL_NO_SPAN);

@@ -931,14 +931,15 @@ typedef enum {
 
 /// A special view hint value
 typedef enum {
-  PUGL_DONT_CARE                    = -1, ///< Generic trinary: unset
-  PUGL_FALSE                        = 0,  ///< Generic trinary: false
-  PUGL_TRUE                         = 1,  ///< Generic trinary: true
-  PUGL_OPENGL_API                   = 2,  ///< For #PUGL_CONTEXT_API
-  PUGL_OPENGL_ES_API                = 3,  ///< For #PUGL_CONTEXT_API
-  PUGL_OPENGL_CORE_PROFILE          = 4,  ///< For #PUGL_CONTEXT_PROFILE
-  PUGL_OPENGL_COMPATIBILITY_PROFILE = 5,  ///< For #PUGL_CONTEXT_PROFILE
-  PUGL_NO_SPAN                      = 0,  ///< Unset span
+  PUGL_DONT_CARE                    = -1,     ///< Generic trinary: unset
+  PUGL_FALSE                        = 0,      ///< Generic trinary: false
+  PUGL_TRUE                         = 1,      ///< Generic trinary: true
+  PUGL_OPENGL_API                   = 2,      ///< For #PUGL_CONTEXT_API
+  PUGL_OPENGL_ES_API                = 3,      ///< For #PUGL_CONTEXT_API
+  PUGL_OPENGL_CORE_PROFILE          = 4,      ///< For #PUGL_CONTEXT_PROFILE
+  PUGL_OPENGL_COMPATIBILITY_PROFILE = 5,      ///< For #PUGL_CONTEXT_PROFILE
+  PUGL_NO_COORD                     = -32768, ///< Unset coordinate
+  PUGL_NO_SPAN                      = 0,      ///< Unset span
 } PuglViewHintValue;
 
 /// View type
@@ -947,6 +948,50 @@ typedef enum {
   PUGL_VIEW_TYPE_UTILITY, ///< A utility window like a palette or toolbox
   PUGL_VIEW_TYPE_DIALOG,  ///< A dialog window
 } PuglViewType;
+
+/**
+   A hint for configuring/constraining the position of a view.
+
+   The system will attempt to make the view's window adhere to these, but they
+   are suggestions, not hard constraints.  Applications should handle any view
+   position gracefully.
+
+   An unset position has `INT16_MIN` (-32768) for both `x` and `y`.  This sigil
+   is chosen because it makes the range of coordinates, -32767 to 32767,
+   conveniently symmetric.  In practice, set positions should be between -16000
+   and 16000 for portability.  Usually the position `{0, 0}` is (near) the
+   top-left of the (or a) display.
+*/
+typedef enum {
+  /**
+     Default position.
+
+     This is used as the position during window creation as a default, if no
+     other position is specified.  It isn't necessary to set a default position
+     (unlike the default size, which is required).  If not even a default
+     position is set, then the window will be created at an arbitrary position.
+     This position is a best-effort attempt to do the most reasonable thing for
+     the initial display of the window, for example, by centering.  Note that
+     it is implementation-defined, subject to change, platform-specific, and
+     for embedded views, may no longer make sense if the parent's size is
+     adjusted.  Code that wants to make assumptions about the initial position
+     must set the default to a specific valid one, such as `{0, 0}`.
+  */
+  PUGL_DEFAULT_POSITION,
+
+  /**
+     Current position.
+
+     This reflects the current position of the view, which may be different from
+     the default position if the view has been moved by the user, window
+     manager, or for any other reason.  Typically, it overrides the
+     default position.
+  */
+  PUGL_CURRENT_POSITION,
+} PuglPositionHint;
+
+/// The number of #PuglPositionHint values
+#define PUGL_NUM_POSITION_HINTS ((unsigned)PUGL_CURRENT_POSITION + 1U)
 
 /**
    A hint for configuring/constraining the size of a view.
@@ -1198,6 +1243,23 @@ puglSetPosition(PuglView* view, int x, int y);
 PUGL_API
 PuglStatus
 puglSetSize(PuglView* view, unsigned width, unsigned height);
+
+/**
+   Set a position hint for the view.
+
+   This can be used to set the default, program-calculated, or user-specified
+   position of a view.
+
+   This should be called before puglRealize() so the initial window for the
+   view can be configured correctly.  It may also be used dynamically after the
+   window is realized, for some hints.
+
+   @return An error code on failure, but always succeeds if the view is not yet
+   realized.
+*/
+PUGL_API
+PuglStatus
+puglSetPositionHint(PuglView* view, PuglPositionHint hint, int x, int y);
 
 /**
    Set a size hint for the view.
