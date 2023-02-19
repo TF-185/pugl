@@ -2007,7 +2007,9 @@ puglSetSizeHint(PuglView* const    view,
 
   view->sizeHints[hint].width  = width;
   view->sizeHints[hint].height = height;
-  return updateSizeHints(view);
+
+  return (hint == PUGL_CURRENT_SIZE) ? puglSetSize(view, width, height)
+                                     : updateSizeHints(view);
 }
 
 PuglStatus

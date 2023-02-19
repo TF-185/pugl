@@ -931,13 +931,14 @@ typedef enum {
 
 /// A special view hint value
 typedef enum {
-  PUGL_DONT_CARE                    = -1, ///< Generic trinary: Use best default
-  PUGL_FALSE                        = 0,  ///< Generic trinary: Explicitly false
-  PUGL_TRUE                         = 1,  ///< Generic trinary: Explicitly true
+  PUGL_DONT_CARE                    = -1, ///< Generic trinary: unset
+  PUGL_FALSE                        = 0,  ///< Generic trinary: false
+  PUGL_TRUE                         = 1,  ///< Generic trinary: true
   PUGL_OPENGL_API                   = 2,  ///< For #PUGL_CONTEXT_API
   PUGL_OPENGL_ES_API                = 3,  ///< For #PUGL_CONTEXT_API
   PUGL_OPENGL_CORE_PROFILE          = 4,  ///< For #PUGL_CONTEXT_PROFILE
   PUGL_OPENGL_COMPATIBILITY_PROFILE = 5,  ///< For #PUGL_CONTEXT_PROFILE
+  PUGL_NO_SPAN                      = 0,  ///< Unset span
 } PuglViewHintValue;
 
 /// View type
@@ -962,6 +963,15 @@ typedef enum {
      size is specified.
   */
   PUGL_DEFAULT_SIZE,
+
+  /**
+     Current size.
+
+     This reflects the current size of the view, which may be different from
+     the default size if the view is resizable.  Typically, it overrides the
+     default size.
+  */
+  PUGL_CURRENT_SIZE,
 
   /**
      Minimum size.
@@ -1196,10 +1206,11 @@ puglSetSize(PuglView* view, unsigned width, unsigned height);
    as well as the supported range of aspect ratios.
 
    This should be called before puglRealize() so the initial window for the
-   view can be configured correctly.
+   view can be configured correctly.  It may also be used dynamically after the
+   window is realized, for some hints.
 
-   @return #PUGL_UNKNOWN_ERROR on failure, but always succeeds if the view is
-   not yet realized.
+   @return An error code on failure, but always succeeds if the view is not yet
+   realized.
 */
 PUGL_API
 PuglStatus

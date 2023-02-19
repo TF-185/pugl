@@ -15,7 +15,7 @@
 bool
 puglIsValidSize(const PuglViewSize size)
 {
-  return size.width && size.height;
+  return (size.width != PUGL_NO_SPAN) && (size.height != PUGL_NO_SPAN);
 }
 
 void

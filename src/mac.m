@@ -1089,6 +1089,7 @@ updateSizeHint(PuglView* const view, const PuglSizeHint hint)
 
   switch (hint) {
   case PUGL_DEFAULT_SIZE:
+  case PUGL_CURRENT_SIZE:
     break;
 
   case PUGL_MIN_SIZE:
@@ -1158,8 +1159,8 @@ getInitialFrame(PuglView* const view)
 
   const PuglRect frame = {(PuglCoord)(centerX - (defaultSize.width / 2U)),
                           (PuglCoord)(centerY - (defaultSize.height / 2U)),
-                          view->sizeHints[PUGL_DEFAULT_SIZE].width,
-                          view->sizeHints[PUGL_DEFAULT_SIZE].height};
+                          defaultSize.width,
+                          defaultSize.height};
   return frame;
 }
 
@@ -1819,7 +1820,8 @@ puglSetSizeHint(PuglView* const    view,
   view->sizeHints[hint].width  = width;
   view->sizeHints[hint].height = height;
 
-  return view->impl->window ? updateSizeHint(view, hint) : PUGL_SUCCESS;
+  return (hint == PUGL_CURRENT_SIZE) ? puglSetSize(view, hint, width, height)
+                                     : PUGL_SUCCESS;
 }
 
 PuglStatus
