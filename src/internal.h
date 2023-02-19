@@ -18,6 +18,10 @@
 
 PUGL_BEGIN_DECLS
 
+/// Return true if `size` is a valid view size
+bool
+puglIsValidSize(PuglViewSize size);
+
 /// Set hint to a default value if it is unset (PUGL_DONT_CARE)
 void
 puglEnsureHint(PuglView* view, PuglViewHint hint, int value);
