@@ -1727,20 +1727,10 @@ puglSetFrame(PuglView* view, const PuglRect frame)
   return dispatchCurrentChildViewConfiguration(view);
 }
 
-PuglStatus
-puglSetPosition(PuglView* const view, const int x, const int y)
+static PuglStatus
+puglSetWindowPosition(PuglView* const view, const int x, const int y)
 {
-  if (x < INT16_MIN || x > INT16_MAX || y < INT16_MIN || y > INT16_MAX) {
-    return PUGL_BAD_PARAMETER;
-  }
-
   PuglInternals* const impl = view->impl;
-  if (!impl->wrapperView) {
-    // Set defaults to be used when realized
-    view->defaultX = x;
-    view->defaultY = y;
-    return PUGL_SUCCESS;
-  }
 
   const PuglRect frame = {(PuglCoord)x,
                           (PuglCoord)y,
@@ -1766,20 +1756,12 @@ puglSetPosition(PuglView* const view, const int x, const int y)
   return dispatchCurrentChildViewConfiguration(view);
 }
 
-PuglStatus
-puglSetSize(PuglView* const view, const unsigned width, const unsigned height)
+static PuglStatus
+puglSetWindowSize(PuglView* const view,
+                  const unsigned  width,
+                  const unsigned  height)
 {
-  if (width > INT16_MAX || height > INT16_MAX) {
-    return PUGL_BAD_PARAMETER;
-  }
-
   PuglInternals* const impl = view->impl;
-  if (!impl->wrapperView) {
-    // Set defaults to be used when realized
-    view->sizeHints[PUGL_DEFAULT_SIZE].width  = (PuglSpan)width;
-    view->sizeHints[PUGL_DEFAULT_SIZE].height = (PuglSpan)height;
-    return PUGL_SUCCESS;
-  }
 
   if (impl->window) {
     // Adjust top-level window frame
@@ -1816,7 +1798,7 @@ puglSetPositionHint(PuglView* const        view,
   view->positionHints[hint].x = (PuglCoord)x;
   view->positionHints[hint].y = (PuglCoord)y;
 
-  return (hint == PUGL_CURRENT_POSITION) ? puglSetPosition(view, x, y)
+  return (hint == PUGL_CURRENT_POSITION) ? puglSetWindowPosition(view, x, y)
                                          : PUGL_SUCCESS;
 }
 
@@ -1834,7 +1816,7 @@ puglSetSizeHint(PuglView* const    view,
   view->sizeHints[hint].width  = (PuglSpan)width;
   view->sizeHints[hint].height = (PuglSpan)height;
 
-  return (hint == PUGL_CURRENT_SIZE) ? puglSetSize(view, hint, width, height)
+  return (hint == PUGL_CURRENT_SIZE) ? puglSetWindowSize(view, width, height)
                                      : PUGL_SUCCESS;
 }
 
