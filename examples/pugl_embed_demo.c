@@ -50,18 +50,6 @@ static const float backgroundColorVertices[] = {
 
 // clang-format on
 
-static PuglRect
-getChildFrame(const PuglRect parentFrame)
-{
-  const PuglRect childFrame = {
-    borderWidth,
-    borderWidth,
-    (PuglSpan)(parentFrame.width - 2 * borderWidth),
-    (PuglSpan)(parentFrame.height - 2 * borderWidth)};
-
-  return childFrame;
-}
-
 static void
 onDisplay(PuglView* view)
 {
@@ -133,16 +121,17 @@ onKeyPress(PuglView* view, const PuglKeyEvent* event)
 static PuglStatus
 onParentEvent(PuglView* view, const PuglEvent* event)
 {
-  PuglTestApp*   app         = (PuglTestApp*)puglGetHandle(view);
-  const PuglRect parentFrame = puglGetFrame(view);
+  PuglTestApp* const app = (PuglTestApp*)puglGetHandle(view);
 
   printEvent(event, "Parent: ", app->verbose);
 
   switch (event->type) {
   case PUGL_CONFIGURE:
     reshapeCube((float)event->configure.width, (float)event->configure.height);
-
-    puglSetFrame(app->child, getChildFrame(parentFrame));
+    puglSetSizeHint(app->child,
+                    PUGL_CURRENT_SIZE,
+                    event->configure.width - 2U * borderWidth,
+                    event->configure.height - 2U * borderWidth);
     break;
   case PUGL_UPDATE:
     if (app->continuous) {
@@ -261,7 +250,6 @@ main(int argc, char** argv)
 
   puglSetWorldString(app.world, PUGL_CLASS_NAME, "PuglEmbedDemo");
 
-  const PuglRect parentFrame = {0, 0, 512, 512};
   puglSetSizeHint(app.parent, PUGL_DEFAULT_SIZE, 512, 512);
   puglSetSizeHint(app.parent, PUGL_MIN_SIZE, 192, 192);
   puglSetSizeHint(app.parent, PUGL_MAX_SIZE, 1024, 1024);
@@ -288,8 +276,13 @@ main(int argc, char** argv)
     return logError("Failed to create parent window (%s)\n", puglStrerror(st));
   }
 
-  puglSetFrame(app.child, getChildFrame(parentFrame));
   puglSetParentWindow(app.child, puglGetNativeView(app.parent));
+  puglSetPositionHint(
+    app.child, PUGL_DEFAULT_POSITION, borderWidth, borderWidth);
+  puglSetSizeHint(app.child,
+                  PUGL_DEFAULT_SIZE,
+                  512U - 2U * borderWidth,
+                  512U - 2U * borderWidth);
 
   puglSetViewHint(app.child, PUGL_CONTEXT_DEBUG, opts.errorChecking);
   puglSetViewHint(app.child, PUGL_SAMPLES, opts.samples);
